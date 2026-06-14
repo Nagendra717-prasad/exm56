@@ -1,0 +1,62 @@
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+docker start sonar
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('hello') {
+            steps {
+                writeFile file: 'app.py', text: 'print("hello")'
+            }
+        }
+
+        stage('sonarva') {
+            steps {
+                script {
+                    def scannerHome = tool 'sonar'
+
+                    withSonarQubeEnv('sonar') {
+                        bat """
+                        ${scannerHome}\\bin\\sonar-scanner.bat ^
+                        -Dsonar.projectKey=demo ^
+                        -Dsonar.sources=.
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+sonar.projectKey=python-demo
+sonar.projectName=python-demo
+sonar.sources=.
+sonar.host.url=http://localhost:9000
+sonar.token=squ_6c4c06301abdfb2389311535ae4253aa19570dc9
+
+
+
+
+
+
+
+pipeline {
+agent any
+
+stages {
+    stage('SonarQube Scan') {
+        steps {
+            dir('D:/Project') {
+                bat 'D:/Sonarscanner/sonar-scanner-8.0.1.6346-windows-x64/bin/sonar-scanner.bat'
+            }
+        }
+    }
+}
+
+
+}
